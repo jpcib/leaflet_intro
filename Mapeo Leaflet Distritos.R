@@ -1,3 +1,6 @@
+#Instalamos los paquetes si no los tenemos
+install.packages("sp")
+install.packages("tidyverse")
 install.packages("leaflet")
 install.packages("rgdal")
 
@@ -8,13 +11,11 @@ library(leaflet)
 library(rgdal)
 
 
-x <- data.frame (5 + 5)
-
 #creamos un mapa con leaflet.
   
 m_prueba1 <- leaflet() %>% 
-  addTiles("https://servicios.usig.buenosaires.gob.ar/mapcache/tms/1.0.0/amba_con_transporte_3857@GoogleMapsCompatible/{z}/{x}/{-y}.png") %>% #addTiles() nos da la capa base del mapa.Vacío agrega tiles default de OpenStreetMap
-  addMarkers(lng = -58.445071, lat = -34.616823, popup = "Centro Geografico de la CABA") #agregamos marcador con popup
+  addTiles() %>% #addTiles() nos da la capa base del mapa.Vacío agrega tiles default de OpenStreetMap
+  addMarkers(lng = -58.445071, lat = -34.616823, popup = "Centro Geografico de la CABA") #agregamos marcador con popup clickeable
 m_prueba1
 
 
@@ -37,11 +38,16 @@ m_prueba3
 
 
 #Descargamos el dataset de distritos económicos para poder graficarlos en el mapa
-# https://data.buenosaires.gob.ar/dataset/distritos-economicos/archivo/juqdkmgo-742-resource
+#Puede ser desde la página de datos del GCBA o del repositorio de github con el código que sigue:
+#https://data.buenosaires.gob.ar/dataset/distritos-economicos/archivo/juqdkmgo-742-resource
 
+download.file("https://raw.githubusercontent.com/jpcib/leaflet_intro/master/distritos-economicos.zip", 
+              destfile = "distritos-economicos.zip", mode='wb')
+unzip("distritos-economicos.zip", exdir = ".")
+file.remove("distritos-economicos.zip")
 
 #Generamos un objeto data_distritos del Shapefile descargado, y preparamos los datos
-data_distritos <- readOGR("E:/Escritorio/Lab/maps/distritos_economicos.shp", encoding = "UTF-8") #readOGR nos permite leer n .shp y utilizamos la codificación de caracteres "UTF-8".
+data_distritos <- readOGR("distritos-economicos.shp", encoding = "UTF-8") #readOGR nos permite leer un .shp y utilizamos la codificación de caracteres "UTF-8".
 data_distritos <- spTransform(data_distritos, CRS("+proj=longlat +datum=WGS84 +no_defs"))#spTransform nos permite asignar al .shp con el sistema de coordenadas WGS84 que es rl estándar
 
 
